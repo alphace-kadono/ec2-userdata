@@ -1,11 +1,11 @@
 if [[ -z ${deployUser} ]];
 then
-  echo "VAR is not set"
+  echo "deployUser is not set"
 else
-  echo "VAR is set"
+  echo "deployUser is set"
 fi
 
-echo "deployUser = {$deployUser}"
+echo "deployUser = ${deployUser}"
 
 
 if [[ -z ${PATH} ]];
@@ -15,4 +15,4 @@ else
   echo "PATH is set"
 fi
 
-echo "PATH = {$PATH}"
+echo "PATH = ${PATH}"
