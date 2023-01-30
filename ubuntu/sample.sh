@@ -6,4 +6,5 @@ fi
 # deploy ユーザー
 USER="${deployUser}"
 # userdel -r ${USER}
+echo ${USER}
 useradd -m -s /bin/bash ${USER}
