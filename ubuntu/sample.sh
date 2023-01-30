@@ -1,8 +1,7 @@
 if [[ -z ${deployUser} ]];
 then
   echo "deployUser is not set"
-else
-  echo "deployUser is set"
+  exit 1;
 fi
 
 echo "deployUser = ${deployUser}"
