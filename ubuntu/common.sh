@@ -1,8 +1,9 @@
-# Ubuntu 22.04 LTSのインスタンスにSSH接続/ログインできません。
-# https://help.arena.ne.jp/hc/ja/articles/5737789875223-Ubuntu-22-04-LTS%E3%81%AE%E3%82%A4%E3%83%B3%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%E3%81%ABSSH%E6%8E%A5%E7%B6%9A-%E3%83%AD%E3%82%B0%E3%82%A4%E3%83%B3%E3%81%A7%E3%81%8D%E3%81%BE%E3%81%9B%E3%82%93-
-cp -p /etc/ssh/sshd_config{,.default}
+# Ubuntu 22.04 LTSの SSH サービスにて ssh-rsa はデフォルトで無効にされている
+# 暫定的に ssh-rsa を有効にしておく
+# https://zenn.dev/noraworld/articles/ssh-rsa-sha1-disabled
+cp -pn /etc/ssh/sshd_config{,.default}
 sed -i '1s/^/PubkeyAcceptedAlgorithms=+ssh-rsa\n/' /etc/ssh/sshd_config
-systemctl restart ssh.service
+systemctl restart ssh
 
 # タイムゾーン
 timedatectl set-timezone Asia/Tokyo
@@ -20,7 +21,13 @@ $nrconf{kernelhints} = '0';
 $nrconf{restart} = 'a';
 EOF
 
-# git
-apt -y install git
 # awscli
-apt -y install awscli
+snap install aws-cli --classic
+
+# 日本語ローケルのインストール・設定
+# https://zenn.dev/okz/articles/39d7faa7a6d59a
+apt -y install manpages-ja manpages-ja-dev
+apt -y install language-pack-ja
+
+cp -pn /etc/locale.conf{,.default}
+update-locale LANG=ja_JP.utf8
