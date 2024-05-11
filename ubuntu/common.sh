@@ -10,7 +10,7 @@ timedatectl set-timezone Asia/Tokyo
 
 # apt -y update
 # apt -y upgrade
-apt upgrade -U
+apt -y upgrade -U
 
 # Ubuntu でアップグレードした場合の警告表示を無効化する
 # https://sig9.org/archives/4580
