@@ -1,3 +1,6 @@
+# タイムゾーン
+timedatectl set-timezone Asia/Tokyo
+
 # Ubuntu 22.04 LTSの SSH サービスにて ssh-rsa はデフォルトで無効にされている
 # 暫定的に ssh-rsa を有効にしておく
 # https://zenn.dev/noraworld/articles/ssh-rsa-sha1-disabled
@@ -5,8 +8,16 @@ cp -pn /etc/ssh/sshd_config{,.default}
 sed -i '1s/^/PubkeyAcceptedAlgorithms=+ssh-rsa\n/' /etc/ssh/sshd_config
 systemctl restart ssh
 
-# タイムゾーン
-timedatectl set-timezone Asia/Tokyo
+# Nginx 1.24.0 のリポジトリを追加する
+# https://skrum.co.jp/blog/upgrade-from-nginx-1-18-0-to-1-24-0/
+curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor \
+  | tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
+
+# gpg --dry-run --quiet --import --import-options import-show /usr/share/keyrings/nginx-archive-keyring.gpg
+
+echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] \
+http://nginx.org/packages/ubuntu `lsb_release -cs` nginx" \
+    | sudo tee /etc/apt/sources.list.d/nginx.list
 
 # apt -y update
 # apt -y upgrade
