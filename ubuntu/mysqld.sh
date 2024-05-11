@@ -1,14 +1,13 @@
-### MySQL
-# How to solve the `invalid default value for 'post_date'` error on WordPress DB with MySQL when modifying the schema of wp_posts table · GitHub
-# https://gist.github.com/kaorukobo/718f4eb684ac01e1b65fc4cb69587fae## usage
+## MySQL
 apt -y install mysql-server mysql-client
 
 # 外部ホストからの接続を許可
-# AWS セキュリティグループのルールを優先させる
-cp -p /etc/mysql/mysql.conf.d/mysqld.cnf{,.default}
+# AWS セキュリティグループにて 3306 ポートを制限するため、ここではソースアドレスの設定は不要
+cp -pn /etc/mysql/mysql.conf.d/mysqld.cnf{,.default}
 sed -i 's/^bind-address.*$/bind-address = 0.0.0.0/g' /etc/mysql/mysql.conf.d/mysqld.cnf
 
 # sql_mode 変更 WordPress 対応
+[ -f "/etc/mysql/mysql.conf.d/sql_mode.cnf" ] && cp -pn /etc/mysql/mysql.conf.d/sql_mode.cnf{,.default}
 cat <<\_EOT_ >> /etc/mysql/mysql.conf.d/sql_mode.cnf
 [mysqld]
 # MySQL 8のmy.cnfでsql_modeを設定する
@@ -22,7 +21,7 @@ _EOT_
 systemctl enable mysql
 systemctl restart mysql
 
-### 以降は手動操作で
+## 以降は手動操作で
 # 認証プラグインを指定してユーザーを作成する
 # https://www.javadrive.jp/mysql/user/index9.html
 # mysql -u root

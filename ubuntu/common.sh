@@ -8,11 +8,9 @@ systemctl restart ssh
 # タイムゾーン
 timedatectl set-timezone Asia/Tokyo
 
-apt -y update
-apt -y upgrade
-
-## 2022/10/06(木) 18:41
-# alphace.2022.pem に変更 → Ed25519 鍵
+# apt -y update
+# apt -y upgrade
+apt upgrade -U
 
 # Ubuntu でアップグレードした場合の警告表示を無効化する
 # https://sig9.org/archives/4580

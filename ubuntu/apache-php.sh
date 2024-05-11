@@ -10,47 +10,65 @@ add-apt-repository -y ppa:ondrej/php
 
 apt -y update
 
-for ver in 5.6 7.4 8.1 ; do
-  apt-get -y install php${ver} php${ver}-{apcu,cli,curl,fpm,gd,intl,mbstring,memcached,mysqlnd,opcache,pdo,xml,zip}
+for ver in 5.6 7.4 8.1 8.3 ; do
+  apt-get -y install php${ver} php${ver}-{apcu,cli,curl,fpm,gd,intl,mbstring,memcached,mysqlnd,opcache,pdo,xml,zip,imagick}
 done
 
-for ver in 5.6 7.4 8.1 ; do
-  cp -p /etc/php/${ver}/fpm/pool.d/www.conf{,.default}
-  cp -p /etc/php/${ver}/fpm/php.ini{,.default}
-  cp -p /etc/php/${ver}/fpm/php-fpm.conf{,.default}
+for ver in 5.6 7.4 8.1 8.3 ; do
+  cp -pn /etc/php/${ver}/fpm/pool.d/www.conf{,.default}
+  cp -pn /etc/php/${ver}/fpm/php.ini{,.default}
+  cp -pn /etc/php/${ver}/fpm/php-fpm.conf{,.default}
 done
 
-for ver in 5.6 7.4 8.1 ; do
+for ver in 5.6 7.4 8.1 8.3 ; do
+  systemctl enable php${ver}-fpm
   systemctl start php${ver}-fpm
 done
 
+## Apache
 apt -y install apache2 libapache2-mod-fcgid
-cp -p /etc/apache2/apache2.conf{,.default}
-cp -p /etc/apache2/ports.conf{,.default}
+cp -pn /etc/apache2/apache2.conf{,.default}
+cp -pn /etc/apache2/ports.conf{,.default}
+cp -pn /etc/apache2/conf-available/security.conf{,.default}
 
-# Apache モジュールの有効化｜無効化
-a2dismod php7.4
-a2enmod proxy ssl rewrite alias
-a2enmod proxy_fcgi
+mkdir -p /etc/apache2/include/
+cat << 'EOF' > /etc/apache2/include/vhosts.conf
+Protocols h2 http/1.1
+SetEnvIf X-Forwarded-Proto "https" HTTPS=on
+EOF
+
+# Apache 設定の有効化
+a2enconf php7.4-fpm
+
+# Apache モジュールの有効化
+a2enmod alias headers proxy proxy_fcgi rewrite
+# a2dismod ssl # Nginx Proxy を使用するので SSL は不要
 
 # Apache サイトの有効化｜無効化
-# a2ensite sample-site.com
-# a2dissite sample-site.com
+a2dissite 000-default
+# a2ensite sample
+
+systemctl enable apache2
+systemctl restart apache2
 
 # Apache テスト
-apachectl configtest
-systemctl restart apache2
-systemctl restart mysqld
-systemctl status apache2
-systemctl enable apache2
+# apachectl configtest
+# systemctl restart mysqld
+# systemctl status apache2
 
 ## Nginx
 apt -y install nginx
-unlink /etc/nginx/sites-enabled/default
+# unlink /etc/nginx/sites-enabled/default
 
-cp -p /etc/nginx/nginx.conf{,.default}
+cp -pn /etc/nginx/nginx.conf{,.default}
 # nano /etc/nginx/sites-available/sample-site
 # ln -s /etc/nginx/sites-available/sample-site /etc/nginx/sites-enabled/
 
-# /etc/nginx
+systemctl enable nginx
 systemctl restart nginx
+
+# Let's Encriptでワイルドカード証明書を取得
+# https://rapicro.com/certbot-lets-encript-wildcard-certificate/
+snap install core && snap refresh core
+snap install --classic certbot
+# ln -nfs /snap/bin/certbot /usr/bin/certbot
