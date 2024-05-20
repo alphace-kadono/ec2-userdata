@@ -22,9 +22,9 @@ echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] \
 http://nginx.org/packages/ubuntu `lsb_release -cs` nginx" \
     | sudo tee /etc/apt/sources.list.d/nginx.list
 
-# apt -y update
-# apt -y upgrade
-apt -y upgrade -U
+apt -y update
+apt -y upgrade
+# apt -y upgrade -U
 
 # Ubuntu でアップグレードした場合の警告表示を無効化する
 # https://sig9.org/archives/4580
