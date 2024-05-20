@@ -6,6 +6,9 @@ timedatectl set-timezone Asia/Tokyo
 # https://zenn.dev/noraworld/articles/ssh-rsa-sha1-disabled
 cp -pn /etc/ssh/sshd_config{,.default}
 sed -i '1s/^/PubkeyAcceptedAlgorithms=+ssh-rsa\n/' /etc/ssh/sshd_config
+sed -i 's/^#ClientAliveInterval.*$/ClientAliveInterval 300/g' /etc/ssh/sshd_config
+sed -i 's/^#ClientAliveCountMax.*$/ClientAliveCountMax 3/g' /etc/ssh/sshd_config
+
 systemctl restart ssh
 
 # Nginx 1.24.0 のリポジトリを追加する
